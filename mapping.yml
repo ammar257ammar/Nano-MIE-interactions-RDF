@@ -22,11 +22,12 @@ prefixes:
   sio: "http://semanticscience.org/resource/"
   wdt: "http://www.wikidata.org/prop/direct/"
   wd: "http://www.wikidata.org/entity/"
-  cheminf: "http://semanticscience.org/resource/"
   bao: "http://www.bioassayontology.org/bao#"
   efo: "http://www.ebi.ac.uk/efo/"
   skos: "http://www.w3.org/2004/02/skos/core#"
-  NCBITAXON: http://purl.bioontology.org/ontology/NCBITAXON/
+  cito: "http://purl.org/net/cito"
+  nci: "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#"
+  NCBITAXON: "http://purl.bioontology.org/ontology/NCBITAXON/"
   
 base: https://ammar257ammar.github.com/RDFied-datasets/ns:
 
@@ -49,6 +50,7 @@ external:
   measureGroupSubjectUrl: https://ammar257ammar.github.com/RDFied-datasets/ns:measurementGroup_
   assaySubjectUrl: https://ammar257ammar.github.com/RDFied-datasets/ns:assay_
   protocolSubjectUrl: https://ammar257ammar.github.com/RDFied-datasets/ns:protocol_
+  methodSubjectUrl: https://ammar257ammar.github.com/RDFied-datasets/ns:method_
   endpointSubjectUrl: https://ammar257ammar.github.com/RDFied-datasets/ns:endpoint_
   aopEventUrl: https://identifiers.org/aop.events/
 
@@ -57,15 +59,12 @@ mappings:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_datasetSubjectUrl)]
-          - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(_datasetName))
+          - [grel:valueParameter2, $(_datasetName)]
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, void:DataSet~iri]
       - [dcterms:title, $(_datasetTitle), en~lang]
       - [dcterms:description, $(_datasetDescription), en~lang]
@@ -76,39 +75,34 @@ mappings:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_chemicalSubstanceSubjectUrl)]
-          - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape))
+          - [grel:valueParameter2, $(row_id)_substance]
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, obo:CHEBI_59999~iri] # chemical substance
       - [rdfs:label, $(np), en~lang]
       - [dcterms:title, $(material_type_name), en~lang]
       - [dcterms:description, $(np): $(material_type_name), en~lang]
       - [dcterms:type, $(material_type)~iri]
       - [dcterms:identifier, $(erm_id)~iri]
+      - [nci:C25492, $(mie_described_in_paper), en~lang] #https://ncithesaurus.nci.nih.gov/ncitbrowser/ConceptReport.jsp?dictionary=NCI_Thesaurus&code=C25492&ns=ncit
       - predicate: dcterms:source
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_datasetSubjectUrl)]
-              - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(_datasetName))
+              - [grel:valueParameter2, $(_datasetName)]
       - predicate: dcterms:source
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_referenceSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(source))
+                value: $(source)
       - predicate: sio:SIO_000636
         object:
           - function: grel:join
@@ -137,287 +131,331 @@ mappings:
             - [grel:valueParameter2, NA]
       - predicate: obo:BFO_0000056
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_mg)
+                value: $(row_id)_primary_size_mg
       - predicate: obo:BFO_0000056
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_mg)
+                value: $(row_id)_bundle_diameter_mg
       - predicate: obo:BFO_0000056
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_mg)
+                value: $(row_id)_diameter_mg
       - predicate: obo:BFO_0000056
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_mg)
+                value: $(row_id)_hydrodynamic_diameter_mg
       - predicate: obo:BFO_0000056
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_mg)
+                value: $(row_id)_surface_area_mg
       - predicate: obo:BFO_0000056
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_mg)
+                value: $(row_id)_shape_mg
+      - predicate: obo:BFO_0000056
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_measureGroupSubjectUrl)] # the hashed string is the same for the material with added endpoint name and _mg at the end
+              - parameter: grel:valueParameter2
+                value: $(row_id)_zeta_potential_mg
   assayPrimarySize:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_as)
+            value: $(row_id)_primary_size_as
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000015~iri] # bioassay
-      - predicate: rdfs:label
-        object: 
-          value: $(primary_size_instrument)
-          datatype: xsd:string
-        condition:
-          function: grel:stringNotEmpty
-          parameters:
-            - [grel:valueParameter, $(primary_size_instrument)]
+      - [rdfs:label, "bioassay for nanomaterial primary size", en~lang]
       - predicate: bao:BAO_0000209
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_mg)
+                value: $(row_id)_primary_size_mg
       - predicate: bao:BAO_0002846
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_protocolSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_ap)                  
+                value: $(row_id)_primary_size_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_primary_size_me                 
   assayBundleDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_as)
+            value: $(row_id)_bundle_diameter_as
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000015~iri] # bioassay
+      - [rdfs:label, "bioassay for nanomaterial bundle diameter", en~lang]
       - predicate: bao:BAO_0000209
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_mg)
+                value: $(row_id)_bundle_diameter_mg
       - predicate: bao:BAO_0002846
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_protocolSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_ap)
+                value: $(row_id)_bundle_diameter_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_bundle_diameter_me
   assayDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_as)
+            value: $(row_id)_diameter_as
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000015~iri] # bioassay
-      - predicate: rdfs:label
-        object: 
-          value: $(diameter_instrument)
-          datatype: xsd:string
-        condition:
-          function: grel:stringNotEmpty
-          parameters:
-            - [grel:valueParameter, $(diameter_instrument)]
+      - [rdfs:label, "bioassay for nanomaterial diameter", en~lang]
       - predicate: bao:BAO_0000209
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_mg)
+                value: $(row_id)_diameter_mg
       - predicate: bao:BAO_0002846
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_protocolSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_ap)    
+                value: $(row_id)_diameter_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_diameter_me                 
   assayHydrodynamicDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_as)
+            value: $(row_id)_hydrodynamic_diameter_as
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000015~iri] # bioassay
-      - predicate: rdfs:label
-        object: 
-          value: $(hydrodynamic_diameter_instrument)
-          datatype: xsd:string
-        condition:
-          function: grel:stringNotEmpty
-          parameters:
-            - [grel:valueParameter, $(hydrodynamic_diameter_instrument)]
+      - [rdfs:label, "bioassay for nanomaterial hydrodynamic diameter", en~lang]
       - predicate: bao:BAO_0000209
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_mg)
+                value: $(row_id)_hydrodynamic_diameter_mg
       - predicate: bao:BAO_0002846
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_protocolSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_ap)
+                value: $(row_id)_hydrodynamic_diameter_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_hydrodynamic_diameter_me
+  assaySurfaceArea:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_surface_area_as
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000015~iri] # bioassay
+      - [rdfs:label, "bioassay for nanomaterial surface area", en~lang]
+      - predicate: bao:BAO_0000209
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_measureGroupSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_surface_area_mg
+      - predicate: bao:BAO_0002846
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_protocolSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_surface_area_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_surface_area_me
   assayShape:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_as)
+            value: $(row_id)_shape_as
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000015~iri] # bioassay
+      - [rdfs:label, "bioassay for nanomaterial shape", en~lang]
       - predicate: bao:BAO_0000209
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_mg)
+                value: $(row_id)_shape_mg
       - predicate: bao:BAO_0002846
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_protocolSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_ap) 
+                value: $(row_id)_shape_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_shape_me 
   assayZetaPotential:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_assaySubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_as)
+            value: $(row_id)_zeta_potential_as
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000015~iri] # bioassay
-      - predicate: rdfs:label
-        object: 
-          value: $(zeta_potential_instrument)
-          datatype: xsd:string
-        condition:
-          function: grel:stringNotEmpty
-          parameters:
-            - [grel:valueParameter, $(zeta_potential_instrument)]
+      - [rdfs:label, "bioassay for nanomaterial zeta potential", en~lang]
       - predicate: bao:BAO_0000209
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_measureGroupSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_mg)
-  protocolPrimarySize:
+                value: $(row_id)_zeta_potential_mg
+      - predicate: bao:BAO_0002846 #has assay protocl
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_protocolSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_zeta_potential_ap
+      - predicate: bao:BAO_0000207
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_methodSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_zeta_potential_me        
+  methodPrimarySize:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
-          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_ap)
+            value: $(row_id)_primary_size_me
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
-      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdf:type, bao:BAO_0000035~iri] # physical detection method
       - predicate: rdfs:label
         object: 
           value: $(primary_size_method)
@@ -426,20 +464,18 @@ mappings:
           function: grel:stringNotEmpty
           parameters:
             - [grel:valueParameter, $(primary_size_method)]      
-  protocolBundleDiameter:
+  methodBundleDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
-          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_ap)
+            value: $(row_id)_bundle_diameter_me
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
-      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdf:type, bao:BAO_0000035~iri] # physical detection method
       - predicate: rdfs:label
         object: 
           value: $(bundle_diameter_method)
@@ -448,20 +484,18 @@ mappings:
           function: grel:stringNotEmpty
           parameters:
             - [grel:valueParameter, $(bundle_diameter_method)] 
-  protocolDiameter:
+  methodlDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
-          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_ap)
+            value: $(row_id)_diameter_me
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
-      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdf:type, bao:BAO_0000035~iri] 
       - predicate: rdfs:label
         object: 
           value: $(diameter_method)
@@ -470,20 +504,18 @@ mappings:
           function: grel:stringNotEmpty
           parameters:
             - [grel:valueParameter, $(diameter_method)] 
-  protocolHydrodynamicDiameter:
+  methodHydrodynamicDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
-          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_ap)
+            value: $(row_id)_hydrodynamic_diameter_me
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
-      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdf:type, bao:BAO_0000035~iri]
       - predicate: rdfs:label
         object: 
           value: $(hydrodynamic_diameter_method)
@@ -491,21 +523,39 @@ mappings:
         condition:
           function: grel:stringNotEmpty
           parameters:
-            - [grel:valueParameter, $(hydrodynamic_diameter_method)] 
-  protocolShape:
+            - [grel:valueParameter, $(hydrodynamic_diameter_method)]
+  methodSurfaceArea:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
-          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_ap)
+            value: $(row_id)_surface_area_me
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
-      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdf:type, bao:BAO_0000035~iri]
+      - predicate: rdfs:label
+        object: 
+          value: $(surface_area_method)
+          datatype: xsd:string
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(surface_area_method)]           
+  methodShape:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_shape_me
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000035~iri]
       - predicate: rdfs:label
         object: 
           value: $(shape_method)
@@ -514,158 +564,317 @@ mappings:
           function: grel:stringNotEmpty
           parameters:
             - [grel:valueParameter, $(shape_method)]
+  methodZetaPotential:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_methodSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_zeta_potential_me
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000035~iri]
+      - predicate: rdfs:label
+        object: 
+          value: $(zeta_potential_instrument)
+          datatype: xsd:string
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(zeta_potential_instrument)]
+  protocolPrimarySize:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_primary_size_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdfs:label, "assay protocol", en~lang]
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]    
+  protocolBundleDiameter:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_bundle_diameter_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdfs:label, "assay protocol", en~lang]
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]
+  protocolDiameter:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_diameter_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdfs:label, "assay protocol", en~lang]
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]
+  protocolHydrodynamicDiameter:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_hydrodynamic_diameter_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdfs:label, "assay protocol", en~lang]
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]
+  protocolSurfaceArea:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_surface_area_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - [rdfs:label, "assay protocol", en~lang]
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]
+  protocolShape:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_shape_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]
+  protocolZetaPotential:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_protocolSubjectUrl)] # the hashed string is the same for the material with added _as at the end
+          - parameter: grel:valueParameter2
+            value: $(row_id)_zeta_potential_ap
+    predicateobjects:
+      - [rdf:type, obo:OBI_0000272~iri] # protocol
+      - predicate: cito:citesAsAuthority
+        object:
+          - function: grel:join
+            type: iri
+            parameters:
+              - [grel:valueParameter, https://doi.org/]
+              - [grel:valueParameter2, $(ref_doi)]
   measurementGroupPrimarySize:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_measureGroupSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_mg)
+            value: $(row_id)_primary_size_mg
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000040~iri]
-      - predicate: obo:OBI_0000299
+      - predicate: bao:BAO_0000208
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_ep) 
+                value: $(row_id)_primary_size_ep
   measurementGroupBundleDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_measureGroupSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_mg)
+            value: $(row_id)_bundle_diameter_mg
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000040~iri]
-      - predicate: obo:OBI_0000299
+      - predicate: bao:BAO_0000208
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_ep)
+                value: $(row_id)_bundle_diameter_ep
   measurementGroupDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_measureGroupSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_mg)
+            value: $(row_id)_diameter_mg
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000040~iri]
-      - predicate: obo:OBI_0000299
+      - predicate: bao:BAO_0000208
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_ep)
+                value: $(row_id)_diameter_ep
   measurementGroupHydrodynamicDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_measureGroupSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_mg)
+            value: $(row_id)_hydrodynamic_diameter_mg
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000040~iri]
-      - predicate: obo:OBI_0000299
+      - predicate: bao:BAO_0000208
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_ep)   
+                value: $(row_id)_hydrodynamic_diameter_ep
+  measurementGroupSurfaceArea:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_measureGroupSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_surface_area_mg
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000040~iri]
+      - predicate: bao:BAO_0000208
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_surface_area_ep                
   measurementGroupShape:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_measureGroupSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_mg)
+            value: $(row_id)_shape_mg
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000040~iri]
-      - predicate: obo:OBI_0000299
+      - predicate: bao:BAO_0000208
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_ep)
+                value: $(row_id)_shape_ep
   measurementGroupZetaPotential:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_measureGroupSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_mg)
+            value: $(row_id)_zeta_potential_mg
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000040~iri]
-      - predicate: obo:OBI_0000299
+      - predicate: bao:BAO_0000208
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_ep)                  
+                value: $(row_id)_zeta_potential_ep                 
   endpointPrimarySize:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_primary_size_ep)
+            value: $(row_id)_primary_size_ep
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, obo:PATO_0000117~iri]
       - [rdfs:label, primary size, en~lang]
       - predicate: sio:has-unit
         object: obo:UO_0000018~iri
@@ -709,21 +918,51 @@ mappings:
           function: grel:isValueWithoutQualifier
           parameters:
             - [grel:valueParameter, $(primary_size)]
-            - [grel:valueParameter2, $(primary_size_qualifier)]             
-  endpointBundleDiameter:
+            - [grel:valueParameter2, $(primary_size_qualifier)] 
+  endpointNormalizedPrimarySize:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_bundle_diameter_ep)
+            value: $(row_id)_normalized_primary_size_ep
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, obo:PATO_0000117~iri]
+      - [rdfs:label, normalized primary size, en~lang]
+      - [sio:has-unit, obo:UO_0000018~iri]
+      - predicate: bao:BAO_0095000 # is derived from
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_primary_size_ep  
+      - predicate: sio:has-value
+        object: 
+          value: $(normalized_primary_size)
+          datatype: xsd:float
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(normalized_primary_size)]   
+  endpointBundleDiameter:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_bundle_diameter_ep
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, obo:PATO_0001334~iri]
       - [rdfs:label, bundle diameter , en~lang]
       - predicate: sio:has-unit
         object: obo:UO_0000018~iri
@@ -768,20 +1007,50 @@ mappings:
           parameters:
             - [grel:valueParameter, $(bundle_diameter)]
             - [grel:valueParameter2, $(bundle_diameter_qualifier)]
-  endpointDiameter:
+  endpointNormalizedBundleDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_diameter_ep)
+            value: $(row_id)_normalized_bundle_diameter_ep
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, obo:PATO_0001334~iri]
+      - [rdfs:label, normalized bundle diameter , en~lang]
+      - [sio:has-unit, obo:UO_0000018~iri]
+      - predicate: bao:BAO_0095000 # is derived from
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_bundle_diameter_ep
+      - predicate: sio:has-value
+        object: 
+          value: $(normalized_bundle_diameter)
+          datatype: xsd:float
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(normalized_bundle_diameter)]
+  endpointDiameter:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_diameter_ep
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, obo:PATO_0001334~iri]
       - [rdfs:label, diameter, en~lang]
       - predicate: sio:has-unit
         object: obo:UO_0000018~iri
@@ -826,19 +1095,48 @@ mappings:
           parameters:
             - [grel:valueParameter, $(diameter)]
             - [grel:valueParameter2, $(diameter_qualifier)]
-  endpointHydrodynamicDiameter:
+  endpointNormalizedDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_ep)
+            value: $(row_id)_normalized_diameter_ep
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, obo:PATO_0001334~iri]
+      - [rdfs:label, normalized diameter, en~lang]
+      - [sio:has-unit, obo:UO_0000018~iri]
+      - predicate: bao:BAO_0095000 # is derived from
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_diameter_ep 
+      - predicate: sio:has-value
+        object: 
+          value: $(normalized_diameter)
+          datatype: xsd:float
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(normalized_diameter)]
+  endpointHydrodynamicDiameter:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_hydrodynamic_diameter_ep
+    predicateobjects:
       - [rdf:type, bao:BAO_0000179~iri]
       - [rdf:type, npo:NPO_1914~iri]
       - [rdfs:label, hydrodynamic diameter, en~lang]
@@ -858,13 +1156,12 @@ mappings:
             - [grel:valueParameter2, μm]
       - predicate: amb:has-condition
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_medium_ep)
+                value: $(row_id)_hydrodynamic_diameter_medium_ep
       - predicate: obo:STATO_0000035
         object: 
           value: $(hydrodynamic_diameter)
@@ -894,40 +1191,149 @@ mappings:
           parameters:
             - [grel:valueParameter, $(hydrodynamic_diameter)]
             - [grel:valueParameter2, $(hydrodynamic_diameter_qualifier)]
-  endpointHydrodynamicDiameterMedium:
+  endpointNormalizedHydrodynamicDiameter:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_hydrodynamic_diameter_medium_ep)
+            value: $(row_id)_normalized_hydrodynamic_diameter_ep
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, npo:NPO_1914~iri]
+      - [rdfs:label, normalized hydrodynamic diameter, en~lang]
+      - [sio:has-unit, obo:UO_0000018~iri]
+      - predicate: bao:BAO_0095000 # is derived from
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_hydrodynamic_diameter_ep
+      - predicate: sio:has-value
+        object: 
+          value: $(normalized_hydrodynamic_diameter)
+          datatype: xsd:float
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(normalized_hydrodynamic_diameter)]
+  endpointHydrodynamicDiameterMedium:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_hydrodynamic_diameter_medium_ep
     condition:
       function: grel:stringNotEmpty
       parameters:
         - [grel:valueParameter, $(hydrodynamic_diameter_medium)]
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
       - [rdfs:label, medium, en~lang]
       - [sio:has-value, $(hydrodynamic_diameter_medium), en~lang]
-  endpointShape:
+  endpointSurfaceArea:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_shape_ep)
+            value: $(row_id)_surface_area_ep
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, sio:CHEMINF_000515~iri]
+      - [rdfs:label, specific surface area, en~lang]
+      - predicate: sio:has-unit
+        object: nsvoc:unit_meter_squared_per_gram~iri
+        condition:
+          function: equal
+          parameters:
+            - [grel:valueParameter, $(surface_area_unit)]
+            - [grel:valueParameter2, m2/g]           
+      - predicate: obo:STATO_0000035
+        object: 
+          value: $(surface_area)
+          datatype: xsd:string
+        condition:
+          function: grel:isRangeValue
+          parameters:
+            - [grel:valueParameter, $(surface_area)]
+      - predicate: obo:STATO_0000035
+        object:
+          - function: grel:constructValueWithQualifier
+            parameters:
+              - [grel:valueParameter, $(surface_area)]
+              - [grel:valueParameter2, $(surface_area_qualifier)]
+            datatype: xsd:string
+        condition:
+          function: grel:isValueWithQualifier
+          parameters:
+            - [grel:valueParameter, $(surface_area)]
+            - [grel:valueParameter2, $(surface_area_qualifier)] 
+      - predicate: sio:has-value
+        object: 
+          value: $(surface_area)
+          datatype: xsd:float
+        condition:
+          function: grel:isValueWithoutQualifier
+          parameters:
+            - [grel:valueParameter, $(surface_area)]
+            - [grel:valueParameter2, $(surface_area_qualifier)]
+  endpointNormalizedSurfaceArea:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_normalized_surface_area_ep
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, sio:CHEMINF_000515~iri]
+      - [rdfs:label, normalized surface area, en~lang]
+      - [sio:has-unit, nsvoc:unit_meter_squared_per_gram~iri]
+      - predicate: bao:BAO_0095000 # is derived from
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_surface_area_ep
+      - predicate: sio:has-value
+        object: 
+          value: $(normalized_surface_area)
+          datatype: xsd:float
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(normalized_surface_area)]
+  endpointShape:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_shape_ep
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, npo:NPO_274~iri]
       - [rdfs:label, shape, en~lang]
       - predicate: sio:has-value
         object: 
@@ -941,15 +1347,13 @@ mappings:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_ep)
+            value: $(row_id)_zeta_potential_ep
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
       - [rdf:type, npo:NPO_1812~iri]
       - [rdfs:label, zeta potential, en~lang]
@@ -962,13 +1366,12 @@ mappings:
             - [grel:valueParameter2, mV]
       - predicate: amb:has-condition
         object:
-          - function: grel:join
+          - function: grel:hashAndJoin
             type: iri
             parameters:
               - [grel:valueParameter, $(_endpointSubjectUrl)]
               - parameter: grel:valueParameter2
-                value: 
-                  function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_medium_ep)       
+                value: $(row_id)_zeta_potential_medium_ep     
       - predicate: obo:STATO_0000035
         object: 
           value: $(zeta_potential)
@@ -998,23 +1401,52 @@ mappings:
           parameters:
             - [grel:valueParameter, $(zeta_potential)]
             - [grel:valueParameter2, $(zeta_potential_qualifier)]            
-  endpointZetaPotentialMedium:
+  endpointNormalizedZetaPotential:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_endpointSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(row_id)_$(_datasetName)_$(source)_$(ref_year)_$(ref_author1_last_name)_$(erm_id)_$(np)_$(diameter)_$(hydrodynamic_diameter)_$(hydrodynamic_diameter_medium)_$(zeta_potential)_$(zeta_potential_medium)_$(shape)_zeta_potential_medium_ep)
+            value: $(row_id)_normalized_zeta_potential_ep
+    predicateobjects:
+      - [rdf:type, bao:BAO_0000179~iri]
+      - [rdf:type, npo:NPO_1812~iri]
+      - [rdfs:label, normalized zeta potential, en~lang]
+      - [sio:has-unit, obo:UO_0000247~iri]
+      - predicate: bao:BAO_0095000 # is derived from
+        object:
+          - function: grel:hashAndJoin
+            type: iri
+            parameters:
+              - [grel:valueParameter, $(_endpointSubjectUrl)]
+              - parameter: grel:valueParameter2
+                value: $(row_id)_zeta_potential_ep
+      - predicate: sio:has-value
+        object: 
+          value: $(normalized_zeta_potential)
+          datatype: xsd:float
+        condition:
+          function: grel:stringNotEmpty
+          parameters:
+            - [grel:valueParameter, $(normalized_zeta_potential)]
+  endpointZetaPotentialMedium:
+    sources:
+      - data-source
+    subjects:
+      - function: grel:hashAndJoin
+        type: iri
+        parameters:
+          - [grel:valueParameter, $(_endpointSubjectUrl)]
+          - parameter: grel:valueParameter2
+            value: $(row_id)_zeta_potential_medium_ep
     condition:
       function: grel:stringNotEmpty
       parameters:
         - [grel:valueParameter, $(zeta_potential_medium)]
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, bao:BAO_0000179~iri]
       - [rdfs:label, medium, en~lang]
       - [sio:has-value, $(zeta_potential_medium), en~lang]
@@ -1022,15 +1454,13 @@ mappings:
     sources:
       - data-source
     subjects:
-      - function: grel:join
+      - function: grel:hashAndJoin
         type: iri
         parameters:
           - [grel:valueParameter, $(_referenceSubjectUrl)]
           - parameter: grel:valueParameter2
-            value: 
-              function: grel:md5Hex(grel:valueParameter = $(source))
+            value: $(source)
     predicateobjects:
-      - [rdf:type, nsvoc:Resource~iri]
       - [rdf:type, wd:Q13442814~iri]
       - [rdfs:label, $(ref_title), en~lang]
       - [dcterms:title, $(ref_title), en~lang]
@@ -1062,7 +1492,7 @@ mappings:
         - [grel:valueParameter, $(ke_id)]
         - [grel:valueParameter2, NA]
     predicateobjects:
-      - [skos:altLabel, $(mie_described_in_paper), en~lang]
+      - [rdfs:label, AOP event with ID: $(ke_id), en~lang]
   aopRelatedEvent:
     sources:
       - data-source
@@ -1079,4 +1509,28 @@ mappings:
         - [grel:valueParameter, $(related_ke_id)]
         - [grel:valueParameter2, NA]
     predicateobjects:
-      - [skos:altLabel, $(mie_described_in_paper), en~lang]
+      - [rdfs:label, AOP event with ID: $(related_ke_id), en~lang]
+  unitLabel1:
+    sources:
+      - data-source
+    subjects: http://purl.obolibrary.org/obo/UO_0000018
+    predicateobjects:
+      - [rdfs:label, nanometer, en~lang]
+  unitLabel2:
+    sources:
+      - data-source
+    subjects: http://www.ebi.ac.uk/efo/EFO_0001724
+    predicateobjects:
+      - [rdfs:label, micrometer, en~lang]
+  unitLabel3:
+    sources:
+      - data-source
+    subjects: http://purl.obolibrary.org/obo/UO_0000247
+    predicateobjects:
+      - [rdfs:label, millivolt, en~lang]
+  unitLabel4:
+    sources:
+      - data-source
+    subjects: https://ammar257ammar.github.com/RDFied-datasets/nanosafery_vocabulary:unit_meter_squared_per_gram
+    predicateobjects:
+      - [rdfs:label, unit of specific surface area (surface area per unit of mass): m2/g, en~lang]

@@ -1,8 +1,11 @@
 01-column-comma.txt
 01-column-list.txt
 02-predicates-to-replace.txt
+03-replace non ascii chars.txt
 mapping-before-material-uri.yml
 mapping-older.yml
+mapping-bkp-14112021.yml
 nano-aop-paper-sheet.csv
 nano-aop-paper-sheet-comma.csv
 nano-aop-paper-sheet-comma-rowid.csv
+nano-aop-paper-sheet-comma-latest-rowid-*
