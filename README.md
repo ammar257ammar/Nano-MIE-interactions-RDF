@@ -1,6 +1,6 @@
 # Exploring Adverse Outcome Pathways for Nanomaterials with semantic web technologies
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ammar257ammar/Nano-MIE-interactions-RDF) ![GitHub](https://img.shields.io/github/license/ammar257ammar/Nano-MIE-interactions-RDF)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ammar257ammar/Nano-MIE-interactions-RDF) ![GitHub](https://img.shields.io/github/license/ammar257ammar/Nano-MIE-interactions-RDF) [![DOI](https://zenodo.org/badge/386910392.svg)](https://zenodo.org/badge/latestdoi/386910392)
 
 This repository contains the RML mappings to a convert the dataset produced in this work into RDF, annotated using several ontologies including eNanoMapper and BioAssay ontologies, along with the generated RDF.
 
